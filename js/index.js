@@ -1,6 +1,7 @@
-// Miami coordinates
-const latitude = 25.7617;
-const longitude = -80.1918;
+// Default Miami coordinates
+let latitude = 25.7617;
+let longitude = -80.1918;
+let currentCity = "Miami, Florida";
 
 // Navigation elements
 const currentButton = document.getElementById('currentButton');
@@ -30,6 +31,16 @@ forecastButton.addEventListener('click', () => {
     }
 });
 
+// Search button event listener
+document.getElementById('searchBtn').addEventListener('click', searchCity);
+
+// Allow Enter key to search
+document.getElementById('cityInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        searchCity();
+    }
+});
+
 function switchView(view) {
     if (view === 'current') {
         currentButton.classList.add('active');
@@ -41,6 +52,48 @@ function switchView(view) {
         currentButton.classList.remove('active');
         forecastView.classList.add('active');
         currentView.classList.remove('active');
+    }
+}
+
+// Search for a city and update coordinates
+async function searchCity() {
+    const cityName = document.getElementById('cityInput').value.trim();
+    if (!cityName) return;
+    
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1&language=en&format=json`;
+    
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.results && data.results.length > 0) {
+            const location = data.results[0];
+            latitude = location.latitude;
+            longitude = location.longitude;
+            currentCity = `${location.name}, ${location.country}`;
+            
+            // Update location display
+            document.querySelector('.location').textContent = currentCity;
+            
+            // Reset loaded flags and reload current view
+            currentWeatherLoaded = false;
+            forecastWeatherLoaded = false;
+            
+            // Reload the active view
+            if (currentView.classList.contains('active')) {
+                loadCurrentWeather();
+            } else {
+                loadForecast();
+            }
+            
+            // Clear input
+            document.getElementById('cityInput').value = '';
+        } else {
+            alert('City not found. Please try another name.');
+        }
+    } catch (error) {
+        alert('Error searching for city. Please try again.');
+        console.error('Error searching city:', error);
     }
 }
 
