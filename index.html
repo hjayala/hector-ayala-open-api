@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Dashboard</title>
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Weather Dashboard</h1>
+            <p class="location">Miami, Florida</p>
+            <div class="location-selector">
+                <input type="text" id="cityInput" placeholder="Enter city name...">
+                <button id="searchBtn">Search</button>
+            </div>
+        </header>
+
+        <nav>
+            <button id="currentButton" class="nav-button active">Current Weather</button>
+            <button id="forecastButton" class="nav-button">7-Day Forecast</button>
+        </nav>
+
+        <main>
+            <!-- Current Weather View -->
+            <div id="currentView" class="view active">
+                <div class="loading">Loading current weather...</div>
+                <div id="currentWeather" class="content hidden"></div>
+            </div>
+
+            <!-- Forecast View -->
+            <div id="forecastView" class="view">
+                <div class="loading">Loading forecast...</div>
+                <div id="forecastWeather" class="content hidden"></div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Data provided by <a href="https://open-meteo.com/" target="_blank">Open-Meteo API</a></p>
+        </footer>
+    </div>
+
+    <script src="js/index.js"></script>
+</body>
+</html>
