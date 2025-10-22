@@ -2,6 +2,7 @@
 let latitude = 25.7617;
 let longitude = -80.1918;
 let currentCity = "Miami, Florida";
+let isFahrenheit = true; // Track current unit
 
 // Navigation elements
 const currentButton = document.getElementById('currentButton');
@@ -32,7 +33,7 @@ forecastButton.addEventListener('click', () => {
 });
 
 // Search button event listener
-document.getElementById('searchBtn').addEventListener('click', searchCity);
+document.getElementById('searchButton').addEventListener('click', searchCity);
 
 // Allow Enter key to search
 document.getElementById('cityInput').addEventListener('keypress', (e) => {
@@ -40,6 +41,9 @@ document.getElementById('cityInput').addEventListener('keypress', (e) => {
         searchCity();
     }
 });
+
+// Unit toggle event listener
+document.getElementById('unitToggle').addEventListener('click', toggleUnit);
 
 function switchView(view) {
     if (view === 'current') {
@@ -97,9 +101,29 @@ async function searchCity() {
     }
 }
 
+// Toggle between Fahrenheit and Celsius
+function toggleUnit() {
+    isFahrenheit = !isFahrenheit;
+    
+    // Update button text
+    document.getElementById('unitToggle').textContent = isFahrenheit ? '°F' : '°C';
+    
+    // Reset loaded flags and reload current view
+    currentWeatherLoaded = false;
+    forecastWeatherLoaded = false;
+    
+    // Reload the active view
+    if (currentView.classList.contains('active')) {
+        loadCurrentWeather();
+    } else {
+        loadForecast();
+    }
+}
+
 // Fetch current weather data (Endpoint 1)
 async function loadCurrentWeather() {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code&temperature_unit=fahrenheit&wind_speed_unit=mph`;
+    const tempUnit = isFahrenheit ? 'fahrenheit' : 'celsius';
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code&temperature_unit=${tempUnit}&wind_speed_unit=mph`;
     
     try {
         const response = await fetch(url);
@@ -118,7 +142,8 @@ async function loadCurrentWeather() {
 
 // Fetch 7-day forecast data (Endpoint 2)
 async function loadForecast() {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America/New_York`;
+    const tempUnit = isFahrenheit ? 'fahrenheit' : 'celsius';
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max&temperature_unit=${tempUnit}&wind_speed_unit=mph&timezone=America/New_York`;
     
     try {
         const response = await fetch(url);
@@ -139,12 +164,13 @@ async function loadForecast() {
 function displayCurrentWeather(data) {
     const current = data.current;
     const weatherDescription = getWeatherDescription(current.weather_code);
+    const unit = isFahrenheit ? '°F' : '°C';
     
     const html = `
         <div class="current-card">
             <h2>${weatherDescription}</h2>
-            <div class="temperature">${Math.round(current.temperature_2m)}°F</div>
-            <p style="font-size: 1.1rem; color: #666;">Feels like ${Math.round(current.apparent_temperature)}°F</p>
+            <div class="temperature">${Math.round(current.temperature_2m)}${unit}</div>
+            <p style="font-size: 1.1rem; color: #666;">Feels like ${Math.round(current.apparent_temperature)}${unit}</p>
             
             <div class="weather-details">
                 <div class="detail-card">
@@ -157,7 +183,7 @@ function displayCurrentWeather(data) {
                 </div>
                 <div class="detail-card">
                     <h3>Temperature</h3>
-                    <p>${Math.round(current.temperature_2m)}°F</p>
+                    <p>${Math.round(current.temperature_2m)}${unit}</p>
                 </div>
             </div>
         </div>
@@ -169,6 +195,7 @@ function displayCurrentWeather(data) {
 // Display 7-day forecast
 function displayForecast(data) {
     const daily = data.daily;
+    const unit = isFahrenheit ? '°F' : '°C';
     let html = '<div class="forecast-grid">';
     
     for (let i = 0; i < 7; i++) {
@@ -178,8 +205,8 @@ function displayForecast(data) {
         html += `
             <div class="forecast-card">
                 <div class="forecast-date">${dayName}</div>
-                <div class="forecast-temp">${Math.round(daily.temperature_2m_max[i])}°</div>
-                <div style="color: #999; font-size: 0.9rem;">Low: ${Math.round(daily.temperature_2m_min[i])}°</div>
+                <div class="forecast-temp">${Math.round(daily.temperature_2m_max[i])}${unit}</div>
+                <div style="color: #999; font-size: 0.9rem;">Low: ${Math.round(daily.temperature_2m_min[i])}${unit}</div>
                 <div class="forecast-details">
                     <div>💧 ${daily.precipitation_probability_max[i]}%</div>
                     <div>💨 ${Math.round(daily.wind_speed_10m_max[i])} mph</div>

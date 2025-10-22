@@ -149,9 +149,10 @@ main {
 }
 
 .forecast-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 15px;
+    justify-content: center;
 }
 
 .forecast-card {
@@ -160,6 +161,8 @@ main {
     border-radius: 10px;
     text-align: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-width: 180px;
+    flex: 0 1 auto;
 }
 
 .forecast-card:hover {
@@ -221,6 +224,28 @@ footer a:hover {
     margin-right: auto;
 }
 
+.unit-toggle {
+    margin-top: 15px;
+}
+
+.unit-button {
+    padding: 10px 20px;
+    background: white;
+    color: #667eea;
+    border: none;
+    border-radius: 20px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 60px;
+}
+
+.unit-button:hover {
+    background: #f8f9fa;
+    transform: scale(1.1);
+}
+
 #cityInput {
     flex: 1;
     padding: 12px 20px;
@@ -230,7 +255,7 @@ footer a:hover {
     outline: none;
 }
 
-#searchBtn {
+#searchButton {
     padding: 12px 30px;
     background: white;
     color: #667eea;
@@ -241,7 +266,7 @@ footer a:hover {
     transition: all 0.3s ease;
 }
 
-#searchBtn:hover {
+#searchButton:hover {
     background: #f8f9fa;
     transform: scale(1.05);
 }
@@ -253,9 +278,5 @@ footer a:hover {
     
     .temperature {
         font-size: 4rem;
-    }
-    
-    .forecast-grid {
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     }
 }
